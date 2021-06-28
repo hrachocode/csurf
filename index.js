@@ -19,13 +19,6 @@ var sign = require('cookie-signature').sign
 var Tokens = require('csrf')
 
 /**
- * Module exports.
- * @public
- */
-
-module.exports = csurf
-
-/**
  * CSRF protection middleware.
  *
  * This middleware adds a `req.csrfToken()` function to make a token
@@ -37,6 +30,41 @@ module.exports = csurf
  * @return {Function} middleware
  * @public
  */
+
+function csrfTokenCustom (req) {
+  var secret = getSecret(req, sessionKey, cookie)
+  var sec = secret
+  var token
+
+  // use cached token if secret has not changed
+  if (token && sec === secret) {
+    return token
+  }
+
+  // generate & set new secret
+  if (sec === undefined) {
+    sec = tokens.secretSync()
+    setSecret(req, res, sessionKey, sec, cookie)
+  }
+
+  // update changed secret
+  secret = sec
+
+  // create new token
+  token = tokens.create(secret)
+
+  return token
+}
+
+/**
+ * Module exports.
+ * @public
+ */
+
+ module.exports = {
+  csurf,
+  csrfTokenCustom
+}
 
 function csurf (options) {
   var opts = options || {}

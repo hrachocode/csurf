@@ -10,7 +10,7 @@ var cookieParser = require('cookie-parser')
 var querystring = require('querystring')
 var request = require('supertest')
 
-var csurf = require('..')
+var { csurf } = require('..')
 
 describe('csurf', function () {
   it('should work in req.body', function (done) {
